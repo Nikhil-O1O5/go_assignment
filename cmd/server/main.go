@@ -3,15 +3,17 @@ package main
 import (
 	"go-backend-task/config"
 	"go-backend-task/internal/handler"
-	"go-backend-task/internal/logger"
+	"go-backend-task/internal/logger"    
 	"go-backend-task/internal/repository"
 	"go-backend-task/internal/routes"
 
 	"github.com/gofiber/fiber/v2"
+	fiberLogger "github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/gofiber/fiber/v2/middleware/requestid"
 )
 
 func main() {
-	logger.InitLogger()
+	logger.InitLogger() 
 	defer logger.Log.Sync()
 
 	dbConn, err := config.InitDB()
@@ -24,6 +26,12 @@ func main() {
 	userHandler := handler.NewUserHandler(userRepo)
 	
 	app := fiber.New()
+
+	app.Use(requestid.New())
+
+	app.Use(fiberLogger.New(fiberLogger.Config{
+		Format: "[${time}] ${status} - ${latency} ${method} ${path} ID=${header:X-Request-ID}\n",
+	}))
 
 	routes.SetupUserRoutes(app, userHandler)
 
