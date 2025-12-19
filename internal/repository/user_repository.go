@@ -7,23 +7,31 @@ import (
 )
 
 type UserRepository struct {
-	db      *sql.DB
-	queries *db.Queries 
+	queries *db.Queries
 }
 
 func NewUserRepository(conn *sql.DB) *UserRepository {
 	return &UserRepository{
-		db:      conn,
 		queries: db.New(conn),
 	}
 }
 
-// GetUserByID fetches the raw user from the DB [cite: 43]
-func (r *UserRepository) GetUserByID(ctx context.Context, id int32) (db.User, error) {
+func (r *UserRepository) Create(ctx context.Context, arg db.CreateUserParams) (db.User, error) {
+	return r.queries.CreateUser(ctx, arg)
+}
+
+func (r *UserRepository) GetByID(ctx context.Context, id int32) (db.User, error) {
 	return r.queries.GetUser(ctx, id)
 }
 
-// ListUsers fetches all users [cite: 69]
-func (r *UserRepository) ListUsers(ctx context.Context) ([]db.User, error) {
+func (r *UserRepository) Update(ctx context.Context, arg db.UpdateUserParams) (db.User, error) {
+	return r.queries.UpdateUser(ctx, arg)
+}
+
+func (r *UserRepository) Delete(ctx context.Context, id int32) error {
+	return r.queries.DeleteUser(ctx, id)
+}
+
+func (r *UserRepository) ListAll(ctx context.Context) ([]db.User, error) {
 	return r.queries.ListUsers(ctx)
 }
